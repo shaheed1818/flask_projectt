@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="results-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-2">Screening Results</h1>
+        <p class="text-muted">Showing {{ resumes|length }} processed resumes</p>
+    </div>
+    <div class="action-buttons">
+        <a href="{{ url_for('export_results') }}" class="btn btn-success">
+            <i class="fas fa-file-export me-2"></i> Export CSV
+        </a>
+    </div>
+</div>
+
+<!-- Top Resumes Section -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">Top Resumes</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if top_resumes %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>User</th>
+                            <th>Resume</th>
+                            <th>Score</th>
+                            <th>Keywords</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resume in top_resumes %}
+                        <tr>
+                            <td class="text-center">
+                                {% if loop.index <= 3 %}
+                                    <span class="badge {% if loop.index == 1 %}bg-warning text-dark{% elif loop.index == 2 %}bg-secondary{% else %}bg-danger{% endif %} rounded-circle p-2">
+                                        {{ loop.index }}
+                                    </span>
+                                {% else %}
+                                    {{ loop.index }}
+                                {% endif %}
+                            </td>
+                            <td>{{ resume.owner.username }}</td>
+                            <td>{{ resume.filename }}</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar {% if resume.score >= 75 %}bg-success{% elif resume.score >= 50 %}bg-info{% elif resume.score >= 25 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ resume.score }}%;" 
+                                         aria-valuenow="{{ resume.score }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ resume.score|round(1) }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ resume.keyword_count }}</td>
+                            <td>
+                                <a href="{{ url_for('view_resume', resume_id=resume.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="p-4 text-center">
+                <p class="text-muted mb-0">No resumes have been processed yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- All Resumes Section -->
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">All Resumes</h5>
+        <input type="text" id="resumeSearch" class="form-control form-control-sm w-auto" placeholder="Search...">
+    </div>
+    <div class="card-body p-0">
+        {% if resumes %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0" id="resumesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Resume</th>
+                            <th>Score</th>
+                            <th>Matched Keywords</th>
+                            <th>Count</th>
+                            <th>Upload Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resume in resumes %}
+                        <tr>
+                            <td>{{ resume.id }}</td>
+                            <td>{{ resume.owner.username }}</td>
+                            <td>{{ resume.owner.email }}</td>
+                            <td>{{ resume.filename }}</td>
+                            <td>
+                                {% if resume.score > 0 %}
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar {% if resume.score >= 75 %}bg-success{% elif resume.score >= 50 %}bg-info{% elif resume.score >= 25 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ resume.score }}%;" 
+                                         aria-valuenow="{{ resume.score }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        {{ resume.score|round(1) }}%
+                                    </div>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">Not scored</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if resume.matched_keywords %}
+                                    <div class="keyword-tags">
+                                        {% for keyword in resume.matched_keywords.split(',') %}
+                                            <span class="badge bg-light text-dark">{{ keyword.strip() }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">None</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ resume.keyword_count }}</td>
+                            <td>{{ resume.upload_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <a href="{{ url_for('view_resume', resume_id=resume.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="p-4 text-center">
+                <p class="text-muted mb-0">No resumes have been processed yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('resumeSearch');
+        const table = document.getElementById('resumesTable');
+        
+        if (searchInput && table) {
+            searchInput.addEventListener('keyup', function() {
+                const searchText = this.value.toLowerCase();
+                const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+                
+                for (let i = 0; i < rows.length; i++) {
+                    let match = false;
+                    const cells = rows[i].getElementsByTagName('td');
+                    
+                    for (let j = 0; j < cells.length; j++) {
+                        if (cells[j].textContent.toLowerCase().indexOf(searchText) > -1) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    
+                    rows[i].style.display = match ? '' : 'none';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

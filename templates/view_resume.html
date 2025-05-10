@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-2">Resume Details</h1>
+        <p class="text-muted">Viewing resume information</p>
+    </div>
+    <div>
+        {% if current_user.is_admin %}
+            <a href="{{ url_for('results') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Results
+            </a>
+        {% else %}
+            <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Resume Information</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Filename:</span>
+                        <span class="fw-bold">{{ resume.filename }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Uploaded by:</span>
+                        <span class="fw-bold">{{ user.username }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Email:</span>
+                        <span class="fw-bold">{{ user.email }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span>Upload Date:</span>
+                        <span class="fw-bold">{{ resume.upload_date.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Screening Results</h5>
+            </div>
+            <div class="card-body">
+                {% if resume.score > 0 %}
+                    <div class="score-overview text-center mb-4">
+                        <div class="score-circle position-relative d-inline-block">
+                            <svg width="150" height="150" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="54" fill="none" stroke="#e6e6e6" stroke-width="12" />
+                                <circle cx="60" cy="60" r="54" fill="none" stroke="
+                                    {% if resume.score >= 75 %}#28a745{% elif resume.score >= 50 %}#17a2b8{% elif resume.score >= 25 %}#ffc107{% else %}#dc3545{% endif %}
+                                " stroke-width="12" stroke-dasharray="339.3" stroke-dashoffset="{{ 339.3 - (339.3 * resume.score / 100) }}" transform="rotate(-90 60 60)" />
+                            </svg>
+                            <div class="position-absolute top-50 start-50 translate-middle">
+                                <h1 class="display-4 fw-bold mb-0">{{ resume.score|round(1) }}</h1>
+                                <p class="mb-0">score</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6>Matched Keywords ({{ resume.keyword_count }})</h6>
+                    {% if resume.matched_keywords %}
+                        <div class="keyword-tags my-3">
+                            {% for keyword in resume.matched_keywords.split(',') %}
+                                <span class="badge bg-primary mb-2 me-2 p-2">{{ keyword.strip() }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No keywords matched</p>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-hourglass-half fa-3x text-muted mb-3"></i>
+                        <h5>This resume has not been processed yet</h5>
+                        <p class="text-muted">Use the Admin Dashboard to process resumes with keywords.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">Resume Content</h5>
+    </div>
+    <div class="card-body">
+        <div class="resume-content p-3 bg-light rounded">
+            <pre style="white-space: pre-wrap; font-family: 'Open Sans', sans-serif; font-size: 14px;">{{ resume.content }}</pre>
+        </div>
+    </div>
+</div>
+{% endblock %}

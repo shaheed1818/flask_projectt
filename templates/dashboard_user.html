@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1 class="h3 mb-4">User Dashboard</h1>
+    <p class="text-muted">Welcome back, {{ current_user.username }}!</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Upload New Resume</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('user_dashboard') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.resume.label(class="form-label") }}
+                        {% if form.resume.errors %}
+                            {{ form.resume(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.resume.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.resume(class="form-control", accept=".pdf,.docx") }}
+                        {% endif %}
+                        <small class="form-text text-muted">Accepted formats: PDF, DOCX</small>
+                    </div>
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Your Resumes</h5>
+                <span class="badge bg-light text-dark">{{ resumes|length }} Total</span>
+            </div>
+            <div class="card-body p-0">
+                {% if resumes %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Upload Date</th>
+                                <th>Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resume in resumes %}
+                            <tr>
+                                <td>{{ resume.filename }}</td>
+                                <td>{{ resume.upload_date.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    {% if resume.score > 0 %}
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar {% if resume.score >= 75 %}bg-success{% elif resume.score >= 50 %}bg-info{% elif resume.score >= 25 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ resume.score }}%;" 
+                                             aria-valuenow="{{ resume.score }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            {{ resume.score|round(1) }}%
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted">Not scored yet</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('view_resume', resume_id=resume.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center">
+                    <p class="text-muted mb-0">You haven't uploaded any resumes yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if resumes and has_scored_resumes %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Resume Performance</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 300px;">
+                    <!-- Canvas for Chart.js -->
+                    <canvas id="resumeScoreChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('resumeScoreChart').getContext('2d');
+        
+        // Data from Jinja
+        const resumeNames = [{% for resume in resumes if resume.score > 0 %}'{{ resume.filename }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+        const resumeScores = [{% for resume in resumes if resume.score > 0 %}{{ resume.score }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: resumeNames,
+                datasets: [{
+                    label: 'Resume Score (%)',
+                    data: resumeScores,
+                    backgroundColor: resumeScores.map(score => {
+                        if (score >= 75) return 'rgba(40, 167, 69, 0.7)';
+                        if (score >= 50) return 'rgba(23, 162, 184, 0.7)';
+                        if (score >= 25) return 'rgba(255, 193, 7, 0.7)';
+                        return 'rgba(220, 53, 69, 0.7)';
+                    }),
+                    borderColor: resumeScores.map(score => {
+                        if (score >= 75) return 'rgb(40, 167, 69)';
+                        if (score >= 50) return 'rgb(23, 162, 184)';
+                        if (score >= 25) return 'rgb(255, 193, 7)';
+                        return 'rgb(220, 53, 69)';
+                    }),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Score (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Resume'
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endif %}
+{% endblock %}

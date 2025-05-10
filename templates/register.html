@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <ul class="nav nav-tabs" id="registerTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="user-tab" data-bs-toggle="tab" data-bs-target="#user-pane" type="button" role="tab" aria-controls="user-pane" aria-selected="true">Register as User</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin-pane" type="button" role="tab" aria-controls="admin-pane" aria-selected="false">Register as Admin</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content auth-card p-4 rounded shadow-sm border" id="registerTabContent">
+            <!-- User Registration Form -->
+            <div class="tab-pane fade show active" id="user-pane" role="tabpanel" aria-labelledby="user-tab">
+                <h4 class="mb-4">User Registration</h4>
+                <form method="POST" action="">
+                    {{ user_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ user_form.username.label(class="form-label") }}
+                        {% if user_form.username.errors %}
+                            {{ user_form.username(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in user_form.username.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ user_form.username(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ user_form.email.label(class="form-label") }}
+                        {% if user_form.email.errors %}
+                            {{ user_form.email(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in user_form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ user_form.email(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ user_form.password.label(class="form-label") }}
+                        {% if user_form.password.errors %}
+                            {{ user_form.password(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in user_form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ user_form.password(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ user_form.confirm_password.label(class="form-label") }}
+                        {% if user_form.confirm_password.errors %}
+                            {{ user_form.confirm_password(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in user_form.confirm_password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ user_form.confirm_password(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="register_user" class="btn btn-primary">{{ user_form.submit.label }}</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Admin Registration Form -->
+            <div class="tab-pane fade" id="admin-pane" role="tabpanel" aria-labelledby="admin-tab">
+                <h4 class="mb-4">Admin Registration</h4>
+                <form method="POST" action="">
+                    {{ admin_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ admin_form.username.label(class="form-label") }}
+                        {% if admin_form.username.errors %}
+                            {{ admin_form.username(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in admin_form.username.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ admin_form.username(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ admin_form.email.label(class="form-label") }}
+                        {% if admin_form.email.errors %}
+                            {{ admin_form.email(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in admin_form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ admin_form.email(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ admin_form.password.label(class="form-label") }}
+                        {% if admin_form.password.errors %}
+                            {{ admin_form.password(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in admin_form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ admin_form.password(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ admin_form.confirm_password.label(class="form-label") }}
+                        {% if admin_form.confirm_password.errors %}
+                            {{ admin_form.confirm_password(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in admin_form.confirm_password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ admin_form.confirm_password(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ admin_form.security_code.label(class="form-label") }}
+                        {% if admin_form.security_code.errors %}
+                            {{ admin_form.security_code(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in admin_form.security_code.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ admin_form.security_code(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="register_admin" class="btn btn-primary">{{ admin_form.submit.label }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                Already have an account? <a href="{{ url_for('login') }}">Log In</a>
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}

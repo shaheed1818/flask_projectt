@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4">Find the Perfect Candidate with AI-Powered Resume Screening</h1>
+            <p class="lead mb-4">Save time and discover top talent efficiently with our advanced resume screening tool. Upload resumes, set keywords, and get instant results.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary btn-lg px-4 me-md-2">Go to Dashboard</a>
+                    {% else %}
+                        <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary btn-lg px-4 me-md-2">Go to Dashboard</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Get Started</a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">Log In</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6 mt-5 mt-lg-0">
+            <div class="hero-image-container">
+                <img src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="Resume Screening" class="img-fluid rounded shadow-lg">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features py-5">
+    <h2 class="text-center mb-5">Key Features</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card h-100 p-4 rounded shadow-sm">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-upload fa-2x text-primary"></i>
+                </div>
+                <h3 class="h5">Easy Resume Upload</h3>
+                <p>Upload your resumes in PDF or DOCX format with just a few clicks.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100 p-4 rounded shadow-sm">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-search fa-2x text-primary"></i>
+                </div>
+                <h3 class="h5">Keyword Matching</h3>
+                <p>Specify keywords and skills to automatically match with candidate resumes.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100 p-4 rounded shadow-sm">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-chart-bar fa-2x text-primary"></i>
+                </div>
+                <h3 class="h5">Advanced Analytics</h3>
+                <p>Get detailed scoring and analytics to identify the best candidates quickly.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works py-5 bg-light rounded">
+    <h2 class="text-center mb-5">How It Works</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-number">1</div>
+                    <div class="timeline-content">
+                        <h3 class="h5">Register an Account</h3>
+                        <p>Create a user account to upload resumes or an admin account to screen them.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">2</div>
+                    <div class="timeline-content">
+                        <h3 class="h5">Upload Resumes</h3>
+                        <p>Users upload their resumes in PDF or DOCX format to be screened.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">3</div>
+                    <div class="timeline-content">
+                        <h3 class="h5">Set Screening Criteria</h3>
+                        <p>Admins define keywords and skills to look for in the resumes.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">4</div>
+                    <div class="timeline-content">
+                        <h3 class="h5">Review Results</h3>
+                        <p>Get scored results with matched keywords and export findings.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta py-5">
+    <div class="text-center">
+        <h2 class="mb-4">Ready to Streamline Your Hiring Process?</h2>
+        <p class="lead mb-4">Join hundreds of recruiters and job seekers who use our platform.</p>
+        {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4">Sign Up Now</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
